@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.upstream.outputs.release }}
-      update: ${{ steps.check_tag.outputs.update }}
+      result: ${{ steps.check_tag.outputs.result }}
     steps:
     - name: Get Latest Upstream Release
       id: upstream
@@ -32,15 +32,16 @@ jobs:
       run: |
           if git show-ref --tags --verify --quiet "refs/tags/${{ steps.upstream.outputs.release}}"; then
             echo "Tag ${{ steps.upstream.outputs.release }} exists"
-            echo "update=false" >> $GITHUB_OUTPUT
+            echo "result=noop" >> $GITHUB_OUTPUT
           else
-            echo "update=true" >> $GITHUB_OUTPUT
+            echo "Tag ${{ steps.upstream.outputs.release }} is missing. Trying to update"
+            echo "result=update" >> $GITHUB_OUTPUT
           fi
   update:
     name: Update to last version
     runs-on: ubuntu-latest
     needs: check
-    if: needs.check.outputs.update == true
+    if: needs.check.outputs.result == 'update'
     steps: 
     - name: Strip v prefix
       id: stripv
