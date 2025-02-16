@@ -43,6 +43,11 @@ jobs:
     needs: check
     if: needs.check.outputs.result == 'update'
     steps: 
+    - uses: actions/checkout@v4
+      id: checkout
+      with:
+        ref: develop
+        fetch-depth: 0
     - name: Strip v prefix
       id: stripv
       run: echo "version=$(echo ${{needs.check.outputs.version}} | cut -c2- -)" >> $GITHUB_OUTPUT
