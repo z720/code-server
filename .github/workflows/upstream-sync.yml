@@ -45,7 +45,8 @@ jobs:
     steps: 
     - name: Strip v prefix
       id: stripv
-      run: echo "::set-output name=version::${{ steps.upstream.outputs.release }}"
+      run: echo "version=$(echo ${{steps.upstream.outputs.release}} | cut -c2- -)" >> $GITHUB_OUTPUT
+      # echo "::set-output name=version::${{ steps.upstream.outputs.release }}"
     - name: Update versions
       id: replace-build
       run: sed -i '/^ARG CODESERVER_VERSION=/s/.*/ARG CODESERVER=${{ steps.stripv.outputs.version }}/' Dockerfile
