@@ -37,7 +37,7 @@ jobs:
             echo "Tag ${{ steps.upstream.outputs.release }} already exists" >> $GITHUB_STEP_SUMMARY
             echo "result=noop" >> $GITHUB_OUTPUT
           else
-            if git rev-parse --verify "features/${{ steps.upstream.outputs.release }}"; then
+            if git show-ref --verify --quiet "refs/remotes/origin/features/${{ steps.upstream.outputs.release }}"; then
               echo "Tag ${{ steps.upstream.outputs.release }} is missing but feature branch exists" >> $GITHUB_STEP_SUMMARY
               echo "result=noop" >> $GITHUB_OUTPUT
             else
@@ -72,7 +72,9 @@ jobs:
         git commit -m "Bump code server version ${{ steps.stripv.outputs.version }}"
         git push --set-upstream origin features/${{needs.check.outputs.version}}
     - name: Create pull request
-      run: gh pr create --assignee z720 --base develop --fill-first
+      run: |
+        PR=$(gh pr create --assignee z720 --base develop --fill-first)
+        echo "Pull request created: [${PR}]()" >> $GITHUB_STEP_SUMMARY
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
