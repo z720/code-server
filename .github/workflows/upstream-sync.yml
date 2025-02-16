@@ -20,7 +20,7 @@ jobs:
         #repository: ${UPSTREAM}
         owner: coder
         repo: code-server
-        excludes: prerelease, draft
+        excludes: draft
         token: ${{ secrets.GITHUB_TOKEN }}
     - uses: actions/checkout@v4
       id: checkout
