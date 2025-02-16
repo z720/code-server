@@ -31,10 +31,10 @@ jobs:
       id: check_tag
       run: |
           if git show-ref --tags --verify --quiet "refs/tags/${{ steps.upstream.outputs.release}}"; then
-            echo "Tag ${{ steps.upstream.outputs.release }} exists"
+            echo "Tag ${{ steps.upstream.outputs.release }} already exists" >> $GITHUB_STEP_SUMMARY
             echo "result=noop" >> $GITHUB_OUTPUT
           else
-            echo "Tag ${{ steps.upstream.outputs.release }} is missing. Trying to update"
+            echo "Tag ${{ steps.upstream.outputs.release }} is missing. Trying to update" >> $GITHUB_STEP_SUMMARY
             echo "result=update" >> $GITHUB_OUTPUT
           fi
   update:
@@ -45,7 +45,7 @@ jobs:
     steps: 
     - name: Strip v prefix
       id: stripv
-      run: echo "version=$(echo ${{steps.upstream.outputs.release}} | cut -c2- -)" >> $GITHUB_OUTPUT
+      run: echo "version=$(echo ${{jobs.check.version}} | cut -c2- -)" >> $GITHUB_OUTPUT
       # echo "::set-output name=version::${{ steps.upstream.outputs.release }}"
     - name: Update versions
       id: replace-build
