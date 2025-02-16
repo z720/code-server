@@ -74,7 +74,7 @@ jobs:
     - name: Create pull request
       run: |
         PR=$(gh pr create --assignee z720 --base develop --fill-first)
-        echo "Pull request created: [${PR}]()" >> $GITHUB_STEP_SUMMARY
+        echo "Pull request created: <${PR}>" >> $GITHUB_STEP_SUMMARY
       env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
