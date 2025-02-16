@@ -2,11 +2,9 @@ name: Sync upstream release
 
 on:
   workflow_dispatch:
-  # schedule: 
-  #   - cron: "3 7 * * *"
-  push:
-    branches: 
-    - '*'
+  schedule: 
+    - cron: "3 7 * * *"
+
 
 jobs: 
   check:
