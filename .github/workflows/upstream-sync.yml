@@ -45,7 +45,7 @@ jobs:
     steps: 
     - name: Strip v prefix
       id: stripv
-      run: echo "version=$(echo ${{jobs.check.version}} | cut -c2- -)" >> $GITHUB_OUTPUT
+      run: echo "version=$(echo ${{needs.check.outputs.version}} | cut -c2- -)" >> $GITHUB_OUTPUT
       # echo "::set-output name=version::${{ steps.upstream.outputs.release }}"
     - name: Update versions
       id: replace-build
