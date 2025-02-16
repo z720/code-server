@@ -54,7 +54,7 @@ jobs:
       # echo "::set-output name=version::${{ steps.upstream.outputs.release }}"
     - name: Update versions
       id: replace-build
-      run: sed -i '/^ARG CODESERVER_VERSION=/s/.*/ARG CODESERVER=${{ steps.stripv.outputs.version }}/' Dockerfile
+      run: sed -i '/^ARG CODESERVER_VERSION=/s/.*/ARG CODESERVER_VERSION=${{ steps.stripv.outputs.version }}/' Dockerfile
     - name: Setup committer
       run: |
         git config user.email "action@github.com"
