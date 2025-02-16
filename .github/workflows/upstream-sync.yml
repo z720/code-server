@@ -70,7 +70,7 @@ jobs:
         git config user.name "github-actions"
         git add .
         git commit -m "Bump code server version ${{ steps.stripv.outputs.version }}"
-        git push
+        git push --set-upstream origin features/${{needs.check.outputs.version}}
     - name: Create pull request
       run: gh pr create --assignee z720 --base develop --fill-first
       env:
