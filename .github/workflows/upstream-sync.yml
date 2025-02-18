@@ -54,6 +54,7 @@ jobs:
       id: checkout
       with:
         ref: develop
+        token: ${{ secrets.PAT }}
     - name: Create a feature branch to work on
       run: git checkout -b features/${{needs.check.outputs.version}}
     - name: Strip v prefix
@@ -74,7 +75,7 @@ jobs:
         PR=$(gh pr create --assignee z720 --base develop --fill-first)
         echo "Pull request created: <${PR}>" >> $GITHUB_STEP_SUMMARY
       env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT }}
 
 
 
