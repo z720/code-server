@@ -1,0 +1,43 @@
+name: Tag and release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Prepare release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+      do: ${{ steps.extract.outputs.do }}
+    steps:
+    - name: Checkout develop
+      uses: actions/checkout@v4
+      id: checkout
+      with: 
+        ref: develop
+    - name: Extract version and try to create release
+      id: extract
+      run: |
+        VERSION=$(grep '^ARG CODESERVER_VERSION=' Dockerfile | sed 's/^ARG CODESERVER_VERSION=//')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        gh release create v${VERSION} --generate-notes
+
+  post-release:
+    needs: release
+    # if: needs.prepare-release.outputs.do == 'release'
+    # steps:
+    # - name: Generate release
+      # run: gh release create ${{ needs.prepare-release.outputs.version }} --generate-notes
+    - name: Checkout main
+      uses: actions/checkout@v4
+      id: checkout-main
+      with: 
+        ref: main
+        depth: 0 
+    - name: Merge in main
+      id: merge
+      run: |
+        git merge --squash develop
+        git commit
+        git push origin main
