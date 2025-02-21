@@ -1,7 +1,7 @@
 services:
   app:
-    container_name: code-server-${VERSION:-4.96.4}
-    image: ghcr.io/z720/code-server:${VERSION:-4.96.4}
+    container_name: code-server-${VERSION:-4.97.2}
+    image: ghcr.io/z720/code-server:${VERSION:-4.97.2}
     build:
       context: .
       dockerfile: Dockerfile
@@ -12,7 +12,7 @@ services:
       - ${HOST_HOME:-~}/.config:/home/coder/.config 
       - ${HOST_HOME:-~}/.ssh:/home/coder/.ssh 
       - ${HOST_HOME:-~}/dotfiles:/home/coder/dotfiles 
-      - ${HOST_HOME:-~}/workspaces/vscode-server:/home/coder/project 
+      - ${HOST_HOME:-~}/workspaces:/home/coder/workspaces
     ports:
       # Expose dev port for apps to test
       - 3000:3000 
