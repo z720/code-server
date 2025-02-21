@@ -61,7 +61,9 @@ jobs:
       run: echo "version=$(echo ${{needs.check.outputs.version}} | cut -c2- -)" >> $GITHUB_OUTPUT
     - name: Update version in Dockerfile
       id: replace-build
-      run: sed -i '/^ARG CODESERVER_VERSION=/s/.*/ARG CODESERVER_VERSION=${{ steps.stripv.outputs.version }}/' Dockerfile
+      run: |
+        sed -i '/^ARG CODESERVER_VERSION=/s/.*/ARG CODESERVER_VERSION=${{ steps.stripv.outputs.version }}/' Dockerfile
+        sed -i 's/\${VERSION:-[^}]*}/\${VERSION:-${{ steps.stripv.outputs.version }}}/' docker-compose.yaml 
     - name: Commit files and push to feature branch
       run: |
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
