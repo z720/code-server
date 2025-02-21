@@ -8,6 +8,7 @@ FROM curlimages/curl AS nvm
 ENV  NVM_VERSION=v0.40.1
 RUN curl --silent -o /tmp/nvm.sh https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh
 
+# Download MONGO Client
 FROM curlimages/curl AS mongosh
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
@@ -21,15 +22,14 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; \
     then export  MONGO_ARCH=arm64 \
     else export MONGO_ARCH=x64; \
     fi \
-    && echo "Downloading Mongosh ${MONGO_ARCH}" \
+    && echo "Downloading Mongosh ${MONGO_ARCH} (${TARGETPLATFORM})" \
     && curl --silent -o /mongosh/mongosh.tgz https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-${MONGO_ARCH}.tgz
-RUN tar -zxvf /mongosh/mongosh.tgz 
-RUN rm -rf /mongosh/mongosh.tgz 
+RUN tar -zxvf /mongosh/mongosh.tgz && rm -rf /mongosh/mongosh.tgz 
 
-# Prepare Docker cli install package manager key 
-FROM curlimages/curl AS dockercli
+# Download package manager keys (docker cli and Github cli)
+FROM curlimages/curl AS pkgkeys
 RUN curl --silent -o /tmp/docker.asc https://download.docker.com/linux/ubuntu/gpg 
-
+RUN curl --silent -o /tmp/githubcli-archive-keyring.gpg https://cli.github.com/packages/githubcli-archive-keyring.gpg
 ####################################################################
 # Code server starts here
 ####################################################################
@@ -43,20 +43,26 @@ ENV NODE_VERSION=23.1.0
 USER root
 SHELL ["/bin/bash", "-c"]
 
-# Register apt for docker
+# Register apt for docker and gh cli
 RUN mkdir -p /etc/apt/keyrings && \
     chmod 0755 -R /etc/apt/keyrings && \
     echo \
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
         $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-    tee /etc/apt/sources.list.d/docker.list > /dev/null
-COPY --from=dockercli /tmp/docker.asc /etc/apt/keyrings/docker.asc
+    tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+    echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | \
+    tee /etc/apt/sources.list.d/github-cli.list > /dev/null && \
+    echo "apt setup ok..."
+COPY --from=pkgkeys /tmp/docker.asc /etc/apt/keyrings/docker.asc
+COPY --from=pkgkeys /tmp/githubcli-archive-keyring.gpg /etc/apt/keyrings/githubcli-archive-keyring.gpg
 
 # Install packages
 #apt-get update
-# chmod a+r /etc/apt/keyrings/docker.asc && \
+#
+RUN chmod a+r /etc/apt/keyrings/*
 RUN apt-get update && \
-    apt-get install -y ca-certificates curl zip unzip docker-ce-cli ${WITH_PACKAGES}  && \
+    apt-get install -y ca-certificates curl zip unzip docker-ce-cli gh ${WITH_PACKAGES}  && \
     rm -rf /var/lib/apt/lists/*
 # docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     
