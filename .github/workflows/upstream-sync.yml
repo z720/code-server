@@ -3,7 +3,7 @@ name: Sync upstream release
 on:
   workflow_dispatch:
   schedule: 
-    - cron: "3 7 * * *"
+    - cron: "3 23 * * *"
 
 
 jobs: 
@@ -35,8 +35,8 @@ jobs:
             echo "Tag ${{ steps.upstream.outputs.release }} already exists" >> $GITHUB_STEP_SUMMARY
             echo "result=noop" >> $GITHUB_OUTPUT
           else
-            if git show-ref --verify --quiet "refs/remotes/origin/features/${{ steps.upstream.outputs.release }}"; then
-              echo "Tag ${{ steps.upstream.outputs.release }} is missing but feature branch exists" >> $GITHUB_STEP_SUMMARY
+            if git show-ref --verify --quiet "refs/remotes/origin/upstream/${{ steps.upstream.outputs.release }}"; then
+              echo "Tag ${{ steps.upstream.outputs.release }} is missing but upstream branch exists" >> $GITHUB_STEP_SUMMARY
               echo "result=noop" >> $GITHUB_OUTPUT
             else
               echo "Tag ${{ steps.upstream.outputs.release }} is missing. Trying to update" >> $GITHUB_STEP_SUMMARY
@@ -55,21 +55,23 @@ jobs:
       with:
         ref: develop
         token: ${{ secrets.PAT }}
-    - name: Create a feature branch to work on
-      run: git checkout -b features/${{needs.check.outputs.version}}
+    - name: Create an upstream branch to work on
+      run: git checkout -b upstream/${{needs.check.outputs.version}}
     - name: Strip v prefix
       id: stripv
       run: echo "version=$(echo ${{needs.check.outputs.version}} | cut -c2- -)" >> $GITHUB_OUTPUT
     - name: Update version in Dockerfile
       id: replace-build
-      run: sed -i '/^ARG CODESERVER_VERSION=/s/.*/ARG CODESERVER_VERSION=${{ steps.stripv.outputs.version }}/' Dockerfile
-    - name: Commit files and push to feature branch
+      run: |
+        sed -i '/^ARG CODESERVER_VERSION=/s/.*/ARG CODESERVER_VERSION=${{ steps.stripv.outputs.version }}/' Dockerfile
+        sed -i 's/\${VERSION:-[^}]*}/\${VERSION:-${{ steps.stripv.outputs.version }}}/' docker-compose.yaml 
+    - name: Commit files and push to upstream branch
       run: |
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config user.name "github-actions"
         git add .
         git commit -m "Bump code server version ${{ steps.stripv.outputs.version }}"
-        git push --set-upstream origin features/${{needs.check.outputs.version}}
+        git push --set-upstream origin upstream/${{needs.check.outputs.version}}
     - name: Create pull request
       run: |
         PR=$(gh pr create --assignee z720 --base develop --fill-first)
