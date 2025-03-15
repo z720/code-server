@@ -1,12 +1,14 @@
+name: code-server
 services:
   app:
-    container_name: code-server-${VERSION:-4.98.0}
+    container_name: code-server-app-${VERSION:-4.98.0}
     image: ghcr.io/z720/code-server:${VERSION:-4.98.0}
     build:
       context: .
       dockerfile: Dockerfile
     hostname: code-server
-    restart: unless-stopped 
+    restart: unless-stopped
+    labels: [ "com.centurylinklabs.watchtower.scope=${UPDATE_SCOPE:-code-server}" ]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${HOST_HOME:-~}/.config:/home/coder/.config 
@@ -18,3 +20,11 @@ services:
       - 3000:3000 
       # Expose app port
       - 8080:8080 
+  update:
+    image: containrrr/watchtower
+    container_name: code-server-update
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --scope ${UPDATE_SCOPE:-code-server}
+    profiles:
+    - update
