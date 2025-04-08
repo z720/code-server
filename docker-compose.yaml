@@ -1,8 +1,8 @@
 name: code-server
 services:
   app:
-    container_name: code-server-app-${VERSION:-4.98.2}
-    image: ghcr.io/z720/code-server:${VERSION:-4.98.2}
+    container_name: code-server-app-${VERSION:-4.99.0}
+    image: ghcr.io/z720/code-server:${VERSION:-4.99.0}
     build:
       context: .
       dockerfile: Dockerfile
