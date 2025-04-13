@@ -26,7 +26,7 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        gh release list | grep ${ steps.extract.output.version } || (echo  "Version ${ steps.extract.output.version } exists: STOP"; exit 1;)
+        gh release list | grep " v${ steps.extract.outputs.version } " || (echo  "Version ${ steps.extract.outputs.version } exists: STOP"; exit 1;)
         echo  "Version doesn't exists. Continue..."
         echo "do=nothing" >> $GITHUB_OUTPUT
     - name: Create release
@@ -34,7 +34,7 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run:
-        gh release create v${VERSION} --generate-notes
+        gh release create v${ steps.extract.outputs.version } --generate-notes
         echo " Release created"
         echo "do=release" >> $GITHUB_OUTPUT
 
