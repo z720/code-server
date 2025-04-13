@@ -22,13 +22,12 @@ jobs:
         VERSION=$(grep '^ARG CODESERVER_VERSION=' Dockerfile | sed 's/^ARG CODESERVER_VERSION=//')
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         gh release create v${VERSION} --generate-notes
+        [ $? -eq 0 ] && echo "do=release" >> $GITHUB_OUTPUT || echo "do=nothing" >> $GITHUB_OUTPUT
 
   post-release:
     needs: release
-    # if: needs.prepare-release.outputs.do == 'release'
-    # steps:
-    # - name: Generate release
-      # run: gh release create ${{ needs.prepare-release.outputs.version }} --generate-notes
+    if: needs.release.outputs.do == 'release'
+    steps:
     - name: Checkout main
       uses: actions/checkout@v4
       id: checkout-main
