@@ -26,7 +26,9 @@ jobs:
 
   post-release:
     needs: release
+    name: Post Release
     if: needs.release.outputs.do == 'release'
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout main
       uses: actions/checkout@v4
