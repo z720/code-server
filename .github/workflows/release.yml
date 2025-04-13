@@ -23,8 +23,15 @@ jobs:
       run: |
         VERSION=$(grep '^ARG CODESERVER_VERSION=' Dockerfile | sed 's/^ARG CODESERVER_VERSION=//')
         echo "version=$VERSION" >> $GITHUB_OUTPUT
+    - name: Check version doesn't exist
+      run: |
+        gh release list | grep ${ steps.extract.output.version } || (echo  "Version ${ steps.extract.output.version } exists: STOP"; exit 1;)
+        echo  "Version doesn't exists. Continue..."
+        echo "do=nothing" >> $GITHUB_OUTPUT
+    - name: Create release
         gh release create v${VERSION} --generate-notes
-        [ $? -eq 0 ] && echo "do=release" >> $GITHUB_OUTPUT || echo "do=nothing" >> $GITHUB_OUTPUT
+        echo " Release created"
+        echo "do=release" >> $GITHUB_OUTPUT
 
   post-release:
     needs: release
