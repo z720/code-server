@@ -18,25 +18,18 @@ jobs:
         ref: develop
     - name: Extract version and try to create release
       id: extract
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         VERSION=$(grep '^ARG CODESERVER_VERSION=' Dockerfile | sed 's/^ARG CODESERVER_VERSION=//')
         echo "version=$VERSION" >> $GITHUB_OUTPUT
-    - name: Check version doesn't exist
-      id: check
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        gh release list | grep " v${ steps.extract.outputs.version } " || (echo  "Version ${ steps.extract.outputs.version } exists: STOP"; exit 1;)
-        echo  "Version doesn't exists. Continue..."
-        echo "do=nothing" >> $GITHUB_OUTPUT
-    - name: Create release
-      id: do-release
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run:
-        gh release create v${ steps.extract.outputs.version } --generate-notes
-        echo " Release created"
-        echo "do=release" >> $GITHUB_OUTPUT
+        if gh release create v${VERSION} --generate-notes; then
+          echo "Release created"
+          echo "do=release" >> $GITHUB_OUTPUT
+        else
+          echo  "Version ${VERSION} exists. Stop..."
+          echo "do=nothing" >> $GITHUB_OUTPUT
+        fi
 
   post-release:
     needs: release
