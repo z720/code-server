@@ -15,6 +15,7 @@ services:
       - ${HOST_HOME:-~}/.ssh:/home/coder/.ssh 
       - ${HOST_HOME:-~}/dotfiles:/home/coder/dotfiles 
       - ${HOST_HOME:-~}/workspaces:/home/coder/workspaces
+      - ${HOST_HOME:-~}/.local/share/code-server:/home/coder/.local/share/code-server
     ports:
       # Expose dev port for apps to test
       - 3000:3000 
