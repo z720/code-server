@@ -1,6 +1,6 @@
 ## Parametrized build
 # Code Server main version
-ARG CODESERVER_VERSION=4.99.3
+ARG CODESERVER_VERSION=4.99.4
 
 
 # Get NVM
