@@ -43,6 +43,8 @@ jobs:
       with: 
         ref: main
         depth: 0 
+    - name: Fetch remote branches
+      run: git fetch --all
     - name: Merge in main
       id: merge
       run: |
