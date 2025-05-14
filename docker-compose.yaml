@@ -1,8 +1,8 @@
 name: code-server
 services:
   app:
-    container_name: code-server-app-${VERSION:-4.99.1}
-    image: ghcr.io/z720/code-server:${VERSION:-4.99.1}
+    container_name: code-server-app-${VERSION:-4.99.4}
+    image: ghcr.io/z720/code-server:${VERSION:-4.99.4}
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,6 +15,7 @@ services:
       - ${HOST_HOME:-~}/.ssh:/home/coder/.ssh 
       - ${HOST_HOME:-~}/dotfiles:/home/coder/dotfiles 
       - ${HOST_HOME:-~}/workspaces:/home/coder/workspaces
+      - ${HOST_HOME:-~}/.local/share/code-server:/home/coder/.local/share/code-server
     ports:
       # Expose dev port for apps to test
       - 3000:3000 
