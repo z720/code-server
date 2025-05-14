@@ -48,6 +48,6 @@ jobs:
     - name: Merge in main
       id: merge
       run: |
-        git merge --squash develop
+        git merge --squash origin/develop
         git commit
         git push origin main
