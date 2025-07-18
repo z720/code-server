@@ -81,7 +81,7 @@ WORKDIR /home/coder
 
 #sdkman
 RUN curl -s "https://get.sdkman.io" | bash > /dev/null
-RUN source "/home/coder/.sdkman/bin/sdkman-init.sh" && sdk install java && sdk install quarkus > /dev/null
+RUN source "/home/coder/.sdkman/bin/sdkman-init.sh" && sdk install java 24 && sdk install quarkus > /dev/null
 
 # Install NVM for user
 RUN /tmp/nvm.sh && rm -f /tmp/nvm.sh 
