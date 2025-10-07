@@ -48,5 +48,5 @@ jobs:
     - name: Merge in main
       id: merge
       run: |
-        git merge --squash -m "release" origin/develop
+        git merge --squash --allow-unrelated-histories -m "release" origin/develop
         git push origin main
