@@ -31,24 +31,3 @@ jobs:
           echo "do=nothing" >> $GITHUB_OUTPUT
         fi
 
-  post-release:
-    needs: release
-    name: Post Release
-    if: needs.release.outputs.do == 'release'
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout main
-      uses: actions/checkout@v4
-      id: checkout-main
-      with: 
-        ref: main
-        depth: 0 
-    - name: Fetch remote branches
-      run: git fetch --all
-    - name: Merge in main
-      id: merge
-      run: |
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config user.name "github-actions"
-        git merge --squash --allow-unrelated-histories -m "release" origin/develop
-        git push origin main
