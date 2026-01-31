@@ -1,11 +1,13 @@
 ## Parametrized build
 # Code Server main version
 ARG CODESERVER_VERSION=4.107.1
+ARG NODE_VERSION=v24.13.0
+ARG NVM_VERSION=v0.40.4
+ARG MONGOSH_VERSION=2.6.0
 
 
 # Get NVM
 FROM curlimages/curl AS nvm
-ENV  NVM_VERSION=v0.40.1
 RUN curl --silent -o /tmp/nvm.sh https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh
 
 # Download MONGO Client
@@ -13,7 +15,6 @@ FROM curlimages/curl AS mongosh
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 # linux/amd64,linux/arm64
-ENV MONGOSH_VERSION=2.2.3
 ENV MONGO_ARCH=arm64
 WORKDIR /mongosh
 # x64 : https://downloads.mongodb.com/compass/mongosh-2.3.3-linux-x64.tgz
@@ -37,7 +38,6 @@ FROM ghcr.io/coder/code-server:${CODESERVER_VERSION}-ubuntu
 ARG WITH_PACKAGES=python3
 # Node config
 ENV NVM_DIR=/home/coder/.nvm
-ENV NODE_VERSION=23.1.0
 
 ### Root section 
 USER root
@@ -88,8 +88,8 @@ RUN /tmp/nvm.sh && rm -f /tmp/nvm.sh
 # install node and npm
 RUN source $NVM_DIR/nvm.sh \
     && nvm install $NODE_VERSION \
-    && nvm alias default $NODE_VERSION \
-    && nvm use default
+    && nvm install --lts --latest-npm \
+    && nvm use --lts
 
 ENV NODE_PATH=$NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
