@@ -65,17 +65,27 @@ jobs:
         owner: nvm-sh
         repo: nvm
         excludes: prerelease, draft
-        token: ${{ secrets.GITHUB_TOKEN }}   
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Get Latest Node Upstream Release
+      id: node
+      uses: pozetroninc/github-action-get-latest-release@v0.8.0
+      with: 
+        owner: nodejs
+        repo: node
+        excludes: prerelease, draft
+        token: ${{ secrets.GITHUB_TOKEN }}           
     - name: Strip v prefix
       id: stripv
       run: | 
         echo "version=$(echo ${{needs.check.outputs.version}} | cut -c2- -)" >> $GITHUB_OUTPUT
         echo "nvm_version=$(echo ${{needs.nvm.outputs.version}} | cut -c2- -)" >> $GITHUB_OUTPUT
+        echo "node_version=$(echo ${{needs.node.outputs.version}} | cut -c2- -)" >> $GITHUB_OUTPUT
     - name: Update code-server version in Dockerfile
       id: replace-build
       run: |
         sed -i '/^ARG CODESERVER_VERSION=/s/.*/ARG CODESERVER_VERSION=${{ steps.stripv.outputs.version }}/' Dockerfile
         sed -i '/^ARG NVM_VERSION=/s/.*/ARG NVM_VERSION=${{ steps.stripv.outputs.nvm_version }}/' Dockerfile
+        sed -i '/^ARG NODE_VERSION=/s/.*/ARG NODE_VERSION=${{ steps.stripv.outputs.node_version }}/' Dockerfile
         sed -i 's/\${VERSION:-[^}]*}/\${VERSION:-${{ steps.stripv.outputs.version }}}/' docker-compose.yaml
     - name: Commit files and push to upstream branch
       run: |
