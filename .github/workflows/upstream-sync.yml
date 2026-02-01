@@ -14,15 +14,15 @@ jobs:
       version: ${{ steps.upstream.outputs.release }}
       result: ${{ steps.check_tag.outputs.result }}
     steps:
-    - name: Get Latest Upstream Release
+    # Code-server ####################
+    - name: Get Latest Code server Upstream Release
       id: upstream
       uses: pozetroninc/github-action-get-latest-release@v0.8.0
       with: 
-        #repository: ${UPSTREAM}
         owner: coder
         repo: code-server
         excludes: prerelease, draft
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}     
     - uses: actions/checkout@v4
       id: checkout
       with:
@@ -57,14 +57,26 @@ jobs:
         token: ${{ secrets.PAT }}
     - name: Create an upstream branch to work on
       run: git checkout -b upstream/${{needs.check.outputs.version}}
+      # nvm ####################        
+    - name: Get Latest NVM Upstream Release
+      id: nvm
+      uses: pozetroninc/github-action-get-latest-release@v0.8.0
+      with: 
+        owner: nvm-sh
+        repo: nvm
+        excludes: prerelease, draft
+        token: ${{ secrets.GITHUB_TOKEN }}   
     - name: Strip v prefix
       id: stripv
-      run: echo "version=$(echo ${{needs.check.outputs.version}} | cut -c2- -)" >> $GITHUB_OUTPUT
-    - name: Update version in Dockerfile
+      run: | 
+        echo "version=$(echo ${{needs.check.outputs.version}} | cut -c2- -)" >> $GITHUB_OUTPUT
+        echo "nvm_version=$(echo ${{needs.nvm.outputs.version}} | cut -c2- -)" >> $GITHUB_OUTPUT
+    - name: Update code-server version in Dockerfile
       id: replace-build
       run: |
         sed -i '/^ARG CODESERVER_VERSION=/s/.*/ARG CODESERVER_VERSION=${{ steps.stripv.outputs.version }}/' Dockerfile
-        sed -i 's/\${VERSION:-[^}]*}/\${VERSION:-${{ steps.stripv.outputs.version }}}/' docker-compose.yaml 
+        sed -i '/^ARG NVM_VERSION=/s/.*/ARG NVM_VERSION=${{ steps.stripv.outputs.nvm_version }}/' Dockerfile
+        sed -i 's/\${VERSION:-[^}]*}/\${VERSION:-${{ steps.stripv.outputs.version }}}/' docker-compose.yaml
     - name: Commit files and push to upstream branch
       run: |
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
