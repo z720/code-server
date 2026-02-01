@@ -1,13 +1,13 @@
 ## Parametrized build
 # Code Server main version
 ARG CODESERVER_VERSION=4.108.2
-ARG NODE_VERSION=v24.13.0
-ARG NVM_VERSION=v0.40.4
+ARG NODE_VERSION=24.13.0
+ARG NVM_VERSION=0.40.4
 ARG MONGOSH_VERSION=2.6.0
 
 # Get NVM ##########################################################
 FROM curlimages/curl AS nvm
-RUN curl --silent -o /tmp/nvm.sh https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh
+RUN curl --silent -o /tmp/nvm.sh https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh
 
 # Download MONGO Client ############################################
 FROM curlimages/curl AS mongosh
