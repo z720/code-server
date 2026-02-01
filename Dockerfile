@@ -1,19 +1,21 @@
 ## Parametrized build
 # Code Server main version
 ARG CODESERVER_VERSION=4.108.2
+ARG NODE_VERSION=24.13.0
+ARG NVM_VERSION=0.40.4
+ARG MONGOSH_VERSION=2.6.0
 
-
-# Get NVM
+# Get NVM ##########################################################
 FROM curlimages/curl AS nvm
-ENV  NVM_VERSION=v0.40.1
-RUN curl --silent -o /tmp/nvm.sh https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh
+ARG NVM_VERSION
+RUN curl --silent -o /tmp/nvm.sh https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh
 
-# Download MONGO Client
+# Download MONGO Client ############################################
 FROM curlimages/curl AS mongosh
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+ARG MONGOSH_VERSION
 # linux/amd64,linux/arm64
-ENV MONGOSH_VERSION=2.2.3
 ENV MONGO_ARCH=arm64
 WORKDIR /mongosh
 # x64 : https://downloads.mongodb.com/compass/mongosh-2.3.3-linux-x64.tgz
@@ -26,18 +28,23 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; \
     && curl --silent -o /mongosh/mongosh.tgz https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-${MONGO_ARCH}.tgz
 RUN tar -zxvf /mongosh/mongosh.tgz && rm -rf /mongosh/mongosh.tgz 
 
-# Download package manager keys (docker cli and Github cli)
+# Download package manager keys (docker cli and Github cli) ########
 FROM curlimages/curl AS pkgkeys
 RUN curl --silent -o /tmp/docker.asc https://download.docker.com/linux/ubuntu/gpg 
 RUN curl --silent -o /tmp/githubcli-archive-keyring.gpg https://cli.github.com/packages/githubcli-archive-keyring.gpg
+
 ####################################################################
-# Code server starts here
+# Code server starts here : 
+# ubuntu + codeserver + java + node + mongosh + docker cli
 ####################################################################
 FROM ghcr.io/coder/code-server:${CODESERVER_VERSION}-ubuntu
 ARG WITH_PACKAGES=python3
+ARG NODE_VERSION
+ARG NVM_VERSION
 # Node config
+ENV NODE_VERSION=${NODE_VERSION}
+ENV NVM_VERSION=${NVM_VERSION}
 ENV NVM_DIR=/home/coder/.nvm
-ENV NODE_VERSION=23.1.0
 
 ### Root section 
 USER root
@@ -88,13 +95,8 @@ RUN /tmp/nvm.sh && rm -f /tmp/nvm.sh
 # install node and npm
 RUN source $NVM_DIR/nvm.sh \
     && nvm install $NODE_VERSION \
-    && nvm alias default $NODE_VERSION \
-    && nvm use default
+    && nvm install --lts --latest-npm \
+    && nvm use --lts
 
 ENV NODE_PATH=$NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
-
-
-
-
-
