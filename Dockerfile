@@ -1,10 +1,9 @@
 ## Parametrized build
 # Code Server main version
-ARG CODESERVER_VERSION=4.107.1
+ARG CODESERVER_VERSION=4.108.2
 ARG NODE_VERSION=v24.13.0
 ARG NVM_VERSION=v0.40.4
 ARG MONGOSH_VERSION=2.6.0
-
 
 # Get NVM
 FROM curlimages/curl AS nvm
