@@ -7,12 +7,14 @@ ARG MONGOSH_VERSION=2.6.0
 
 # Get NVM ##########################################################
 FROM curlimages/curl AS nvm
+ARG NVM_VERSION
 RUN curl --silent -o /tmp/nvm.sh https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh
 
 # Download MONGO Client ############################################
 FROM curlimages/curl AS mongosh
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+ARG MONGOSH_VERSION
 # linux/amd64,linux/arm64
 ENV MONGO_ARCH=arm64
 WORKDIR /mongosh
@@ -37,7 +39,11 @@ RUN curl --silent -o /tmp/githubcli-archive-keyring.gpg https://cli.github.com/p
 ####################################################################
 FROM ghcr.io/coder/code-server:${CODESERVER_VERSION}-ubuntu
 ARG WITH_PACKAGES=python3
+ARG NODE_VERSION
+ARG NVM_VERSION
 # Node config
+ENV NODE_VERSION=${NODE_VERSION}
+ENV NVM_VERSION=${NVM_VERSION}
 ENV NVM_DIR=/home/coder/.nvm
 
 ### Root section 
@@ -94,8 +100,3 @@ RUN source $NVM_DIR/nvm.sh \
 
 ENV NODE_PATH=$NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
-
-
-
-
-
