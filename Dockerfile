@@ -5,11 +5,11 @@ ARG NODE_VERSION=v24.13.0
 ARG NVM_VERSION=v0.40.4
 ARG MONGOSH_VERSION=2.6.0
 
-# Get NVM
+# Get NVM ##########################################################
 FROM curlimages/curl AS nvm
 RUN curl --silent -o /tmp/nvm.sh https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh
 
-# Download MONGO Client
+# Download MONGO Client ############################################
 FROM curlimages/curl AS mongosh
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
@@ -26,12 +26,14 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; \
     && curl --silent -o /mongosh/mongosh.tgz https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-${MONGO_ARCH}.tgz
 RUN tar -zxvf /mongosh/mongosh.tgz && rm -rf /mongosh/mongosh.tgz 
 
-# Download package manager keys (docker cli and Github cli)
+# Download package manager keys (docker cli and Github cli) ########
 FROM curlimages/curl AS pkgkeys
 RUN curl --silent -o /tmp/docker.asc https://download.docker.com/linux/ubuntu/gpg 
 RUN curl --silent -o /tmp/githubcli-archive-keyring.gpg https://cli.github.com/packages/githubcli-archive-keyring.gpg
+
 ####################################################################
-# Code server starts here
+# Code server starts here : 
+# ubuntu + codeserver + java + node + mongosh + docker cli
 ####################################################################
 FROM ghcr.io/coder/code-server:${CODESERVER_VERSION}-ubuntu
 ARG WITH_PACKAGES=python3
