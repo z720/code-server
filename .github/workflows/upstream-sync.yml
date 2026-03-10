@@ -1,4 +1,4 @@
-name: Sync upstream release
+bname: Sync upstream release
 
 on:
   workflow_dispatch:
@@ -78,8 +78,8 @@ jobs:
       id: stripv
       run: | 
         echo "version=$(echo ${{needs.check.outputs.version}} | cut -c2- -)" >> $GITHUB_OUTPUT
-        echo "nvm_version=$(echo ${{needs.nvm.outputs.release}} | cut -c2- -)" >> $GITHUB_OUTPUT
-        echo "node_version=$(echo ${{needs.node.outputs.release}} | cut -c2- -)" >> $GITHUB_OUTPUT
+        echo "nvm_version=$(echo ${{steps.nvm.outputs.release}} | cut -c2- -)" >> $GITHUB_OUTPUT
+        echo "node_version=$(echo ${{steps.node.outputs.release}} | cut -c2- -)" >> $GITHUB_OUTPUT
     - name: Update code-server version in Dockerfile
       id: replace-build
       run: |
