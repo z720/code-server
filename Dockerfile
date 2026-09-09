@@ -1,8 +1,8 @@
 ## Parametrized build
 # Code Server main version
-ARG CODESERVER_VERSION=4.133.0
-ARG NODE_VERSION=26.7.0
-ARG NVM_VERSION=0.40.6
+ARG CODESERVER_VERSION=4.136.2
+ARG NODE_VERSION=24.21.0
+ARG NVM_VERSION=0.40.7
 ARG MONGOSH_VERSION=2.6.0
 
 # Get NVM ##########################################################
